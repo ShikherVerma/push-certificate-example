@@ -12,8 +12,17 @@ git init --bare
 touch git-daemon-export-ok  # git daemon only pushes repos with this magic file
 git config receive.certNonceSeed 1000  # necessary for signed push
 git config receive.certNonceSlop 1000  # necessary for signed push
+
 # set up our post-receive hook to handle the certificates.
-cp ../../hook.sh hooks/post-receive && chmod +x hooks/post-receive
+if asksure "Do you want to enable post-receive hook?"; then
+	echo "hook enabled"
+	cp ../../hook.sh hooks/post-receive && chmod +x hooks/post-receive
+fi
+
+if asksure "Do you want to disable garbage collection?"; then
+	echo "Disabling garbage collection"
+	git config gc.auto 0  # disable automatic garbage collecion
+fi
 
 # actually listen. We will send the log to a logfile to avoid polluting our stdout 
 git daemon --verbose --reuseaddr --informative-errors --enable=receive-pack \
@@ -25,7 +34,7 @@ cd ..
 
 # client side
 echo "Ok, Done. You should now be able to clone+push on git://localhost/signed-repo.git"
-if asksure "Do you want to automatically try this out? (y/N)"; then
+if asksure "Do you want to automatically try this out?"; then
     source ../autoclient.sh
     tree ../../signed-repo.git/objects
 else
