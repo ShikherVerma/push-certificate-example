@@ -7,4 +7,4 @@ touch testfile
 git add .
 git commit -m "test commit"
 git push --sign=true origin test
-
+cd ../../
